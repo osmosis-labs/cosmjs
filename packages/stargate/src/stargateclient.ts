@@ -362,13 +362,13 @@ export class StargateClient {
       const result = await this.getTx(txId);
       return result
         ? {
-            code: result.code,
-            height: result.height,
-            rawLog: result.rawLog,
-            transactionHash: txId,
-            gasUsed: result.gasUsed,
-            gasWanted: result.gasWanted,
-          }
+          code: result.code,
+          height: result.height,
+          rawLog: result.rawLog,
+          transactionHash: txId,
+          gasUsed: result.gasUsed,
+          gasWanted: result.gasWanted,
+        }
         : pollForTx(txId);
     };
 

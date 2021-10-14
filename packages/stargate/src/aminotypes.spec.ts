@@ -525,7 +525,7 @@ describe("AminoTypes", () => {
               foo: `amino-prefix-${foo}`,
               constant: "something-for-amino",
             }),
-            fromAmino: () => {},
+            fromAmino: () => { },
           },
         },
       }).toAmino({ typeUrl: "/my.CustomType", value: msg });
@@ -551,7 +551,7 @@ describe("AminoTypes", () => {
             toAmino: (m: MsgDelegate): { readonly foo: string } => ({
               foo: m.delegatorAddress ?? "",
             }),
-            fromAmino: () => {},
+            fromAmino: () => { },
           },
         },
       }).toAmino({
@@ -956,7 +956,7 @@ describe("AminoTypes", () => {
         additions: {
           "/my.CustomType": {
             aminoType: "my-sdk/CustomType",
-            toAmino: () => {},
+            toAmino: () => { },
             fromAmino: ({ foo }: { readonly foo: string; readonly constant: string }): any => ({
               foo: foo.slice(13),
             }),
@@ -977,7 +977,7 @@ describe("AminoTypes", () => {
         additions: {
           "/my.OverrideType": {
             aminoType: "cosmos-sdk/MsgDelegate",
-            toAmino: () => {},
+            toAmino: () => { },
             fromAmino: ({ foo }: { readonly foo: string }): MsgDelegate => ({
               delegatorAddress: foo,
               validatorAddress: "cosmos10dyr9899g6t0pelew4nvf4j5c3jcgv0r73qga5",
