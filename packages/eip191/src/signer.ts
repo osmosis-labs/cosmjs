@@ -40,10 +40,13 @@ export class EIP191Signer implements OfflineAminoSigner {
     const ethaddress = await this.signer.getAddress();
     const bechaddr = Bech32.encode(this.prefix, arrayify(ethaddress));
 
-    return new AccountData({
-      algo: "ethsecp25k1",
-      address: bechaddr,
-    });
+    return [
+      {
+        algo: "ethsecp256k1",
+        address: bechaddr,
+        pubkey: new Uint8Array(),
+      },
+    ];
   }
 
   public async signAmino(signerAddress: string, signDoc: StdSignDoc): Promise<AminoSignResponse> {
@@ -61,13 +64,15 @@ export class EIP191Signer implements OfflineAminoSigner {
 
     const pubkey = recoverPublicKey(hashMessage(indentedJsonSignDoc), signature);
 
-    const stdSig = new StdSignature({
-      pub_key: new EthSecp256k1Pubkey({
-        type: pubkeyType.ethsecp256k1,
-        value: toBase64(arrayify(pubkey)),
-      }),
+    const stdPub: EthSecp256k1Pubkey = {
+      type: pubkeyType.ethsecp256k1,
+      value: toBase64(arrayify(pubkey)),
+    };
+
+    const stdSig: StdSignature = {
+      pub_key: stdPub,
       signature: toBase64(arrayify(signature)),
-    });
+    };
 
     return {
       signed: signDoc,
