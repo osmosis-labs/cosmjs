@@ -17,6 +17,7 @@ export {
   Pubkey,
   Ed25519Pubkey,
   Secp256k1Pubkey,
+  EthSecp256k1Pubkey,
   SinglePubkey,
   isMultisigThresholdPubkey,
   isEd25519Pubkey,
