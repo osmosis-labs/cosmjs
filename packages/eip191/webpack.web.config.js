@@ -4,29 +4,24 @@ const path = require("path");
 const webpack = require("webpack");
 
 const target = "web";
-const distdir = path.join(__dirname, "dist", "web");
+const demodir = path.join(__dirname, "dist", "demo");
 
 module.exports = [
   {
-    // bundle used for Karma tests
+    // bundle used for Ledger demo
     target: target,
-    entry: glob.sync("./build/**/*.spec.js"),
+    entry: glob.sync("./build/demo/web.js"),
     output: {
-      path: distdir,
-      filename: "tests.js",
+      path: demodir,
+      filename: "web.js",
     },
-    plugins: [
-      new webpack.ProvidePlugin({
-        Buffer: ["buffer", "Buffer"],
-      }),
-    ],
     resolve: {
       fallback: {
         buffer: false,
         crypto: false,
         events: false,
         path: false,
-        stream: require.resolve("stream-browserify"),
+        stream: false,
         string_decoder: false,
       },
     },
