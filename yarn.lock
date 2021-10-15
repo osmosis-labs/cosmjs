@@ -515,6 +515,7 @@ __metadata:
     "@cosmjs/math": "workspace:packages/math"
     "@cosmjs/utils": "workspace:packages/utils"
     "@ethersproject/abstract-signer": ^5.4.1
+    "@ethersproject/hash": ^5.4.0
     "@ethersproject/providers": ^5.4.5
     "@ethersproject/signing-key": ^5.4.0
     "@istanbuljs/nyc-config-typescript": ^1.0.1

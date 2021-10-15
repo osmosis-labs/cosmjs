@@ -3527,6 +3527,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@cosmjs/math", "workspace:packages/math"],
             ["@cosmjs/utils", "workspace:packages/utils"],
             ["@ethersproject/abstract-signer", "npm:5.4.1"],
+            ["@ethersproject/hash", "npm:5.4.0"],
             ["@ethersproject/providers", "npm:5.4.5"],
             ["@ethersproject/signing-key", "npm:5.4.0"],
             ["@istanbuljs/nyc-config-typescript", "virtual:4f1584ad4aba8733a24be7c8aebbffafef25607f2d00f4b314cf96717145c692763628a31c2b85d4686fbb091ff21ebffa3cc337399c042c19a32b9bdb786464#npm:1.0.1"],
