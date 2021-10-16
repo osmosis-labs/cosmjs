@@ -57,11 +57,9 @@ export class EIP191Signer implements OfflineAminoSigner {
     }
 
     const aminoJsonSignDoc = serializeSignDoc(signDoc);
-
     const indentedJsonSignDoc = JSON.stringify(JSON.parse(fromUtf8(aminoJsonSignDoc)), null, "  ");
 
     const signature = await this.signer.signMessage(indentedJsonSignDoc);
-
     const pubkey = recoverPublicKey(hashMessage(indentedJsonSignDoc), signature);
 
     const stdPub: EthSecp256k1Pubkey = {
