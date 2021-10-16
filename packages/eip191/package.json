@@ -49,7 +49,9 @@
     "@ethersproject/bytes": "^5.4.0",
     "@ethersproject/hash": "^5.4.0",
     "@ethersproject/providers": "^5.4.5",
-    "@ethersproject/signing-key": "^5.4.0"
+    "@ethersproject/signing-key": "^5.4.0",
+    "@ethersproject/wallet": "^5.4.0",
+    "web3modal": "^1.9.4"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
