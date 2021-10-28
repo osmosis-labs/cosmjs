@@ -40,11 +40,16 @@ export class EIP191Signer implements OfflineAminoSigner {
     const ethaddress = await this.signer.getAddress();
     const bechaddr = Bech32.encode(this.prefix, arrayify(ethaddress));
 
+    const signMsg = "I SOLEMNLY SWEAR I AM UP TO NO GOOD";
+
+    const signature = await this.signer.signMessage(signMsg);
+    const pubkey = recoverPublicKey(hashMessage(signMsg), signature);
+
     return [
       {
         algo: "ethsecp256k1",
         address: bechaddr,
-        pubkey: new Uint8Array(),
+        pubkey: arrayify(pubkey),
       },
     ];
   }

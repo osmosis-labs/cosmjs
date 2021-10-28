@@ -44,33 +44,20 @@ function createSignDoc(accountNumber: number, address: string): string {
   return JSON.stringify(signDoc, null, 2);
 }
 
-window.updateMessage = (accountNumberInput: unknown) => {
-  assert(typeof accountNumberInput === "string");
-  const accountNumber = Uint53.fromString(accountNumberInput).toNumber();
-  const account = accounts[accountNumber];
-  if (account === undefined) {
-    return;
-  }
-
-  const address = accounts[accountNumber].address;
-  const addressInput = document.getElementById("address");
-  addressInput.value = address;
-  const signDocTextArea = document.getElementById("sign-doc");
-  signDocTextArea.textContent = createSignDoc(accountNumber, address);
-};
-
 window.createSigner = async function createSigner(): Promise<EIP191Signer> {
   await window.ethereum.enable();
   const provider = new Web3Provider(window.ethereum);
   return EIP191Signer.fromProvider(provider, "cosmos");
 };
 
-window.getAccounts = async function getAccounts(signer: EIP191Signer | undefined): Promise<void> {
+window.getAccounts = async function getAccounts(): Promise<void> {
+  window.signer = await window.createSigner();
+
+  const signer = window.signer;
   if (signer === undefined) {
     console.error("Please connect web3 wallet");
     return;
   }
-  const accountNumberInput = document.getElementById("account-number");
   const addressInput = document.getElementById("address");
   const accountsDiv = document.getElementById("accounts");
   const signDocTextArea = document.getElementById("sign-doc");
@@ -84,8 +71,6 @@ window.getAccounts = async function getAccounts(signer: EIP191Signer | undefined
     }));
     accountsDiv.textContent = JSON.stringify(prettyAccounts, null, "\n");
     const accountNumber = 0;
-    accountNumberInput.max = accounts.length - 1;
-    accountNumberInput.value = accountNumber;
     const address = accounts[0].address;
     addressInput.value = address;
     signDocTextArea.textContent = createSignDoc(accountNumber, address);
@@ -113,6 +98,6 @@ window.sign = async function sign(signer: EIP191Signer | undefined): Promise<voi
   }
 };
 
-window.onload = async function onLoad(): Promise<void> {
-  window.signer = await window.createSigner();
-};
+// window.onload = async function onLoad(): Promise<void> {
+//   window.signer = await window.createSigner();
+// };
