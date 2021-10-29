@@ -45,12 +45,7 @@
     "@cosmjs/encoding": "workspace:packages/encoding",
     "@cosmjs/math": "workspace:packages/math",
     "@cosmjs/utils": "workspace:packages/utils",
-    "@ethersproject/abstract-signer": "^5.4.1",
-    "@ethersproject/bytes": "^5.4.0",
-    "@ethersproject/hash": "^5.4.0",
-    "@ethersproject/providers": "^5.4.5",
-    "@ethersproject/signing-key": "^5.4.0",
-    "@ethersproject/wallet": "^5.4.0",
+    "ethers": "^5.5.1",
     "web3modal": "^1.9.4"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import { AccountData, makeCosmoshubPath, StdSignDoc } from "@cosmjs/amino";
 import { toBase64 } from "@cosmjs/encoding";
 import { Uint53 } from "@cosmjs/math";
 import { assert } from "@cosmjs/utils";
-import { Web3Provider } from "@ethersproject/providers";
+import { ethers } from "ethers";
 
 import { EIP191Signer } from "../signer";
 
@@ -46,7 +46,7 @@ function createSignDoc(accountNumber: number, address: string): string {
 
 window.createSigner = async function createSigner(): Promise<EIP191Signer> {
   await window.ethereum.enable();
-  const provider = new Web3Provider(window.ethereum);
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
   return EIP191Signer.fromProvider(provider, "cosmos");
 };
 

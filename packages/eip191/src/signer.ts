@@ -1,24 +1,33 @@
 import {
   AccountData,
   AminoSignResponse,
-  EthSecp256k1Pubkey,
+  encodeSecp256k1Pubkey,
   OfflineAminoSigner,
-  pubkeyType,
+  pubkeyToAddress,
+  Secp256k1Pubkey,
   serializeSignDoc,
   StdSignature,
   StdSignDoc,
 } from "@cosmjs/amino";
-import { Bech32, fromUtf8, toBase64 } from "@cosmjs/encoding";
-import { Signer } from "@ethersproject/abstract-signer";
-import { arrayify } from "@ethersproject/bytes";
-import { hashMessage } from "@ethersproject/hash";
-// import { ethers, Signer } from "ethers";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { recoverPublicKey } from "@ethersproject/signing-key";
+import { ripemd160, Secp256k1 } from "@cosmjs/crypto";
+import { Bech32, fromBase64, fromUtf8, toBase64 } from "@cosmjs/encoding";
+import { ethers } from "ethers";
+
+const DEFAULT_SIGN_MSG = "I SOLEMNLY SWEAR I AM UP TO NO GOOD";
+
+function recoverPubkeyFromSignature(signature: string, signMsg: string): Secp256k1Pubkey {
+  const pubkey = ethers.utils.recoverPublicKey(ethers.utils.hashMessage(signMsg), signature);
+  // return encodeSecp256k1Pubkey(ethers.utils.arrayify(pubkey));
+  const compressedPubKey = Secp256k1.compressPubkey(ethers.utils.arrayify(pubkey));
+  console.log(compressedPubKey);
+  return encodeSecp256k1Pubkey(compressedPubKey);
+}
 
 export class EIP191Signer implements OfflineAminoSigner {
-  private readonly signer: Signer;
+  private readonly signer: ethers.Signer;
+  private pubkey?: Secp256k1Pubkey;
   private readonly prefix: string;
+  private readonly signMsg: string;
 
   /**
    * Creates an EIP191 Signer from the given private key
@@ -26,30 +35,51 @@ export class EIP191Signer implements OfflineAminoSigner {
    * @param privkey The private key.
    * @param prefix The bech32 address prefix (human readable part). Defaults to "cosmos".
    */
-  public static async fromProvider(provider: JsonRpcProvider, prefix = "cosmos"): Promise<EIP191Signer> {
+  public static async fromProvider(
+    provider: ethers.providers.JsonRpcProvider,
+    prefix = "cosmos",
+    signMsg = DEFAULT_SIGN_MSG,
+  ): Promise<EIP191Signer> {
     const signer = provider.getSigner();
-    return new EIP191Signer(signer, prefix);
+    return new EIP191Signer(signer, prefix, signMsg);
   }
 
-  private constructor(signer: Signer, prefix: string) {
+  private constructor(signer: ethers.Signer, prefix = "cosmos", signMsg = DEFAULT_SIGN_MSG) {
     this.signer = signer;
     this.prefix = prefix;
+    this.signMsg = signMsg;
+  }
+
+  private async getPubkeyViaSign(): Promise<Secp256k1Pubkey> {
+    const signature = await this.signer.signMessage(this.signMsg);
+    return recoverPubkeyFromSignature(signature, this.signMsg);
+  }
+
+  private async address(): Promise<string> {
+    if (!this.pubkey) {
+      this.pubkey = await this.getPubkeyViaSign();
+    }
+
+    console.log(this.pubkey);
+    console.log(this.prefix);
+    return pubkeyToAddress(this.pubkey, this.prefix);
   }
 
   public async getAccounts(): Promise<readonly AccountData[]> {
-    const ethaddress = await this.signer.getAddress();
-    const bechaddr = Bech32.encode(this.prefix, arrayify(ethaddress));
+    if (!this.pubkey) {
+      this.pubkey = await this.getPubkeyViaSign();
+      console.log(this.pubkey);
+    }
 
-    const signMsg = "I SOLEMNLY SWEAR I AM UP TO NO GOOD";
+    console.log(ripemd160(fromBase64(this.pubkey.value)));
 
-    const signature = await this.signer.signMessage(signMsg);
-    const pubkey = recoverPublicKey(hashMessage(signMsg), signature);
+    const addr = await this.address();
 
     return [
       {
-        algo: "ethsecp256k1",
-        address: bechaddr,
-        pubkey: arrayify(pubkey),
+        algo: "secp256k1",
+        address: addr,
+        pubkey: fromBase64(this.pubkey.value),
       },
     ];
   }
@@ -65,16 +95,14 @@ export class EIP191Signer implements OfflineAminoSigner {
     const indentedJsonSignDoc = JSON.stringify(JSON.parse(fromUtf8(aminoJsonSignDoc)), null, "  ");
 
     const signature = await this.signer.signMessage(indentedJsonSignDoc);
-    const pubkey = recoverPublicKey(hashMessage(indentedJsonSignDoc), signature);
 
-    const stdPub: EthSecp256k1Pubkey = {
-      type: pubkeyType.ethsecp256k1,
-      value: toBase64(arrayify(pubkey)),
-    };
+    if (!this.pubkey) {
+      this.pubkey = recoverPubkeyFromSignature(signature, indentedJsonSignDoc);
+    }
 
     const stdSig: StdSignature = {
-      pub_key: stdPub,
-      signature: toBase64(arrayify(signature)),
+      pub_key: this.pubkey,
+      signature: toBase64(ethers.utils.arrayify(signature)),
     };
 
     return {
