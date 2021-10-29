@@ -9,17 +9,15 @@ import {
   StdSignature,
   StdSignDoc,
 } from "@cosmjs/amino";
-import { ripemd160, Secp256k1 } from "@cosmjs/crypto";
-import { Bech32, fromBase64, fromUtf8, toBase64 } from "@cosmjs/encoding";
+import { ripemd160, Secp256k1, sha256 } from "@cosmjs/crypto";
+import { fromBase64, fromUtf8, toBase64 } from "@cosmjs/encoding";
 import { ethers } from "ethers";
 
 const DEFAULT_SIGN_MSG = "I SOLEMNLY SWEAR I AM UP TO NO GOOD";
 
 function recoverPubkeyFromSignature(signature: string, signMsg: string): Secp256k1Pubkey {
   const pubkey = ethers.utils.recoverPublicKey(ethers.utils.hashMessage(signMsg), signature);
-  // return encodeSecp256k1Pubkey(ethers.utils.arrayify(pubkey));
   const compressedPubKey = Secp256k1.compressPubkey(ethers.utils.arrayify(pubkey));
-  console.log(compressedPubKey);
   return encodeSecp256k1Pubkey(compressedPubKey);
 }
 
@@ -59,9 +57,6 @@ export class EIP191Signer implements OfflineAminoSigner {
     if (!this.pubkey) {
       this.pubkey = await this.getPubkeyViaSign();
     }
-
-    console.log(this.pubkey);
-    console.log(this.prefix);
     return pubkeyToAddress(this.pubkey, this.prefix);
   }
 
@@ -71,7 +66,11 @@ export class EIP191Signer implements OfflineAminoSigner {
       console.log(this.pubkey);
     }
 
-    console.log(ripemd160(fromBase64(this.pubkey.value)));
+    console.log(fromBase64(this.pubkey.value));
+
+    console.log();
+
+    console.log(ripemd160(sha256(fromBase64(this.pubkey.value))));
 
     const addr = await this.address();
 
