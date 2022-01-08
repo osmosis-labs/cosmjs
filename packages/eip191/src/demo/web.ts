@@ -1,13 +1,17 @@
 import { AccountData, makeCosmoshubPath, StdSignDoc } from "@cosmjs/amino";
 import { toBase64 } from "@cosmjs/encoding";
-import { Uint53 } from "@cosmjs/math";
-import { assert } from "@cosmjs/utils";
 import { ethers } from "ethers";
 
 import { EIP191Signer } from "../signer";
 
+// Unpkg imports
+const Web3Modal = window.Web3Modal.default;
+const WalletConnectProvider = window.WalletConnectProvider.default;
+
 declare const window: any;
 declare const document: any;
+
+let web3Modal: typeof Web3Modal;
 
 let accounts: readonly AccountData[] = [];
 
@@ -45,8 +49,10 @@ function createSignDoc(accountNumber: number, address: string): string {
 }
 
 window.createSigner = async function createSigner(): Promise<EIP191Signer> {
-  await window.ethereum.enable();
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const w3provider = await web3Modal.connect();
+
+  // await window.ethereum.enable();
+  const provider = new ethers.providers.Web3Provider(w3provider);
   return EIP191Signer.fromProvider(provider, "cosmos");
 };
 
@@ -98,6 +104,21 @@ window.sign = async function sign(signer: EIP191Signer | undefined): Promise<voi
   }
 };
 
-// window.onload = async function onLoad(): Promise<void> {
-//   window.signer = await window.createSigner();
-// };
+window.onload = async function onLoad(): Promise<void> {
+  const providerOptions = {
+    walletconnect: {
+      package: WalletConnectProvider,
+      options: {
+        // Sunny 's test key - don't copy as your mileage may vary
+        infuraId: "8896ec9242ae472aae0e50b0e48ebfc1",
+      },
+    },
+  };
+
+  web3Modal = new Web3Modal({
+    cacheProvider: false, // optional
+    providerOptions, // required
+    disableInjectedProvider: false, // optional. For MetaMask / Brave / Opera.
+  });
+  // window.signer = await window.createSigner();
+};

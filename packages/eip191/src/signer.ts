@@ -63,14 +63,7 @@ export class EIP191Signer implements OfflineAminoSigner {
   public async getAccounts(): Promise<readonly AccountData[]> {
     if (!this.pubkey) {
       this.pubkey = await this.getPubkeyViaSign();
-      console.log(this.pubkey);
     }
-
-    console.log(fromBase64(this.pubkey.value));
-
-    console.log();
-
-    console.log(ripemd160(sha256(fromBase64(this.pubkey.value))));
 
     const addr = await this.address();
 
@@ -91,7 +84,9 @@ export class EIP191Signer implements OfflineAminoSigner {
     }
 
     const aminoJsonSignDoc = serializeSignDoc(signDoc);
-    const indentedJsonSignDoc = JSON.stringify(JSON.parse(fromUtf8(aminoJsonSignDoc)), null, "  ");
+    const indentedJsonSignDoc = JSON.stringify(JSON.parse(fromUtf8(aminoJsonSignDoc)), null, ". ");
+
+    console.log(indentedJsonSignDoc);
 
     const signature = await this.signer.signMessage(indentedJsonSignDoc);
 
