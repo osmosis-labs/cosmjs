@@ -3,17 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EIP191 Demo</title>
+    <title>Osmosis EIP191 Demo</title>
     <link rel="stylesheet" href="index.css"></style>
 
-    <script type="text/javascript" src="https://unpkg.com/web3modal@1.9.4/dist/index.js"></script>
-    <script type="text/javascript" src="https://unpkg.com/@walletconnect/web3-provider@1.5.1/dist/umd/index.min.js"></script>
+    <!-- <script type="text/javascript" src="https://unpkg.com/web3modal@1.9.8/dist/index.js"></script> -->
+    <!-- <script type="text/javascript" src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script> -->
+
+    <script type="text/javascript" src="https://unpkg.com/web3modal"></script>
+    <script type="text/javascript" src="https://unpkg.com/@walletconnect/web3-provider"></script>
 
     <script src="../dist/demo/web.js"></script>
   </head>
   <body>
     <div>
-      <h1>EIP191 Demo</h1>
+      <h1>Osmosis EIP191 Demo</h1>
     </div>
     <div>
       <ol>
@@ -32,15 +35,21 @@
       <input id="address" type="text" value="" disabled></input>
     </div>
     <div>
-      <label>Message</label>
-      <textarea id="sign-doc">
-      </textarea>
+      <label>To</label>
+      <input id="to" type="text" value=""></input>
+    </div>
+    <div>
+      <label>Amount</label>
+      <input id="amount" type="text" value=""></input>
     </div>
     <div>
       <button onclick="sign(window.signer)">
         Sign Message
       </button>
     </div>
-    <div id="signature"></div>
+    <div id="signed-tx-div" style="visibility: hidden;">
+      <textarea id="signed-tx">
+      </textarea>
+    </div>
   </body>
 </html>
